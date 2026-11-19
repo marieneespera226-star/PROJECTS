@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cashier Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-layout">
+    <div class="sidebar">
+        <h2>Cashier</h2>
+        <nav>
+            <ul>
+                <li><a href="#" class="active" onclick="showCashierSection('products')">Products</a></li>
+                <li><a href="#" onclick="showCashierSection('add-product')">Add Product</a></li>
+                <li><a href="#" onclick="showCashierSection('orders')">Orders (0)</a></li>
+            </ul>
+        </nav>
+        <div class="footer">
+            <p>Signed in as Cashier</p>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>Cashier Operations</h1>
+
+        <div class="card" id="products">
+            <h2>Products</h2>
+            <div id="cashier-product-list">
+                <p>No products yet.</p>
+            </div>
+        </div>
+
+        <div class="card" id="add-product" style="display: none;">
+            <h2>Add New Product</h2>
+            <form onsubmit="event.preventDefault(); addProduct();">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="product-name">Product Name</label>
+                    <input type="text" id="product-name" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="product-price">Price (₱)</label>
+                    <input type="number" id="product-price" step="0.01" min="0.01" required>
+                </div>
+                <button type="submit">Add Product</button>
+            </form>
+        </div>
+
+        <div class="card" id="orders" style="display: none;">
+            <h2>Customer Orders</h2>
+            <div id="orders-list">
+                <p>No orders processed yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Ensure only cashier is logged in
+        checkUserRole('cashier', 'index.html');
+        
+        window.onload = function() {
+            renderCashierProducts();
+            renderOrdersList();
+            // Set initial active link
+            document.querySelector('.sidebar nav li a').classList.add('active');
+        };
+
+        function showCashierSection(sectionId) {
+            document.getElementById('products').style.display = 'none';
+            document.getElementById('add-product').style.display = 'none';
+            document.getElementById('orders').style.display = 'none';
+            document.getElementById(sectionId).style.display = 'block';
+
+            // Manage active link state
+            document.querySelectorAll('.sidebar nav li a').forEach(a => a.classList.remove('active'));
+            document.querySelector(a[onclick*="${sectionId}"]).classList.add('active');
+        }
+
+        // Update the order count in the sidebar
+        function updateOrderCount() {
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            document.querySelector('a[onclick*="orders"]').innerHTML = Orders (${orders.length});
+        }
+        updateOrderCount();
+    </script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+localStorage.setItem('accounts', JSON.stringify([
+    {username: 'admin', password: 'admin123', role: 'amdin'}
+]));
+console.log("Initial admin account created!");

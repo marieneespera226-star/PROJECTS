@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-layout">
+    <div class="sidebar">
+        <h2>Admin</h2>
+        <nav>
+            <ul>
+                <li><a href="#" class="active" onclick="showSection('create-cashier')">Dashboard</a></li>
+                <li><a href="#" onclick="showSection('create-cashier')">Create Cashier</a></li>
+                <li><a href="#" onclick="showSection('employee-accounts')">Employee Accounts</a></li>
+            </ul>
+        </nav>
+        <div class="footer">
+            <p>Signed in as admin</p>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1>Admin Dashboard</h1>
+        <h3>Manage cashier and employee accounts</h3>
+
+        <div class="card" id="create-cashier">
+            <h2>Create Cashier Account</h2>
+            <form onsubmit="event.preventDefault(); createEmployee('cashier');">
+                <div class="form-group" style="display: flex; align-items: center;">
+                    <input type="text" id="cashier-username" placeholder="Username" required>
+                    <input type="password" id="cashier-password" placeholder="Password" required>
+                    <button type="submit">Create Account</button>
+                </div>
+            </form>
+            <p style="margin-top: 10px; color: #aaa;">Cashier accounts can access cashier ordering only.</p>
+        </div>
+
+        <div class="card" id="employee-accounts" style="display: none;">
+            <h2>Employee Accounts</h2>
+            <div id="employee-list-container">
+                </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Ensure only admin is logged in
+        checkUserRole('admin', 'index.html');
+        // Initial render for the account list
+        window.onload = function() {
+            renderEmployeeAccounts();
+            document.querySelector('.sidebar nav li a').classList.add('active'); // Set default active link
+        };
+
+        function showSection(sectionId) {
+            document.getElementById('create-cashier').style.display = 'none';
+            document.getElementById('employee-accounts').style.display = 'none';
+            document.getElementById(sectionId).style.display = 'block';
+
+            // Manage active link state
+            document.querySelectorAll('.sidebar nav li a').forEach(a => a.classList.remove('active'));
+            // This is a simplified active state management for this simple navigation
+            if (sectionId === 'create-cashier') {
+                document.querySelector('a[onclick*="create-cashier"]').classList.add('active');
+            } else if (sectionId === 'employee-accounts') {
+                document.querySelector('a[onclick*="employee-accounts"]').classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

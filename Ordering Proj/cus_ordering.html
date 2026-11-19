@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Ordering System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-layout">
+    <div class="sidebar">
+        <h2>Customer Ordering System</h2>
+        <nav>
+            <ul>
+                <li><a href="#" class="active">Products</a></li>
+            </ul>
+        </nav>
+        <div class="footer">
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>Customer</h1>
+            <button onclick="logout()" class="delete-btn">Logout</button>
+        </div>
+        <p>Select the items, add to cart, and place an order</p>
+
+        <div class="customer-grid">
+            <div class="product-list card">
+                <h2>Products</h2>
+                <div id="customer-product-list">
+                    <p>No products available yet.</p>
+                </div>
+            </div>
+
+            <div class="cart-summary">
+                <h2>Cart</h2>
+                <div id="cart-items">
+                    <p>No items yet.</p>
+                </div>
+                
+                <p>Subtotal: <span id="cart-subtotal">₱0.00</span></p>
+                <p>Tax (10%): <span id="cart-tax">₱0.00</span></p>
+                
+                <p class="total">Total: <span id="cart-total">₱0.00</span></p>
+
+                <div class="cart-buttons">
+                    <button id="checkout-btn" onclick="checkout()">Checkout</button>
+                    <button id="clear-cart-btn" onclick="clearCart()" style="background-color: var(--danger-color);">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Ensure a customer is logged in
+        checkUserRole('customer', 'index.html');
+
+        window.onload = function() {
+            renderCustomerProducts();
+            renderCart();
+        };
+
+        // Renders the cart summary on the customer page
+        function renderCart() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let cartHtml = '';
+            let subtotal = 0;
+            const cartItemsContainer = document.getElementById('cart-items');
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p>No items yet.</p>';
+                document.getElementById('cart-subtotal').textContent = '₱0.00';
+                document.getElementById('cart-tax').textContent = '₱0.00';
+                document.getElementById('cart-total').textContent = '₱0.00';
+                return;
+            }
+
+            cart.forEach(item => {
+                subtotal += item.price * item.quantity;
+                cartHtml += `
+                    <div class="product-card" style="background-color: #2e303c; padding: 10px; margin-bottom: 5px;">
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>₱${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `;
+            });
+
+            const taxRate = 0.10;
+            const tax = subtotal * taxRate;
+            const total = subtotal + tax;
+
+            cartItemsContainer.innerHTML = cartHtml;
+            document.getElementById('cart-subtotal').textContent = ₱${subtotal.toFixed(2)};
+            document.getElementById('cart-tax').textContent = ₱${tax.toFixed(2)};
+            document.getElementById('cart-total').textContent = ₱${total.toFixed(2)};
+        }
+
+        // Add to cart functionality
+        function addToCart(productId) {
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            const product = products.find(p => p.id === productId);
+
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1
+                });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart(); // Re-render the cart UI
+            alert(${product.name} added to cart!);
+        }
+
+        // Clear cart functionality
+        function clearCart() {
+            localStorage.removeItem('cart');
+            renderCart();
+            alert('Cart cleared.');
+        }
+
+        // Checkout functionality
+        function checkout() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+
+            const orders = JSON.parse(localStorage.getItem('orders')) || [];
+            let subtotal = 0;
+            cart.forEach(item => subtotal += item.price * item.quantity);
+            const tax = subtotal * 0.10;
+            const total = subtotal + tax;
+
+            const newOrder = {
+                id: Date.now(),
+                customer: localStorage.getItem('currentUser'),
+                items: cart,
+                subtotal: subtotal.toFixed(2),
+                tax: tax.toFixed(2),
+                total: total.toFixed(2),
+                date: new Date().toLocaleString()
+            };
+
+            orders.push(newOrder);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            
+            // Clear cart after checkout
+            clearCart(); 
+
+            alert(Order placed successfully! Total amount: ₱${newOrder.total});
+        }
+    </script>
+</body>
+</html>

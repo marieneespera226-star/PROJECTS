@@ -1,0 +1,4 @@
+<div id="dashboard" class="hidden">
+    <h2>Welcome to your dashboard!</h2>
+    <button onclick="logout()">Logout</button>
+</div>
